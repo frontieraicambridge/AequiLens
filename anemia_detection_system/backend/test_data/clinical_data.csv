@@ -1,0 +1,7 @@
+patient_id,sample_id,icd10_codes,symptoms
+P001,S001,"[""D50.0"", ""D50.9""]","Patient exhibits persistent fatigue, conjunctival pallor, and mild resting tachycardia."
+P001,S002,"[""D50.0""]","Follow-up assessment after 4 weeks of oral ferrous sulfate therapy; slight improvement in palpebral mucosal erythema."
+P002,S001,"[""D50.8"", ""E61.1""]","Brittle fingernails with mild koilonychia (spoon nails), cold intolerance, and chronic dizziness."
+P003,S001,"[""D50.9""]","Exertional dyspnea, pale palmar creases, and reported lightheadedness upon standing."
+P003,S002,"[""D50.0"", ""K29.0""]","Microcytic anemia secondary to occult gastrointestinal blood loss, severe conjunctival pallor, headache."
+

@@ -2,7 +2,7 @@
 
 > **Project**: Iron Deficiency Anemia Detection System
 > **Started**: 2026-11-06
-> **Last Updated**: 2026-11-06 (Phase 5 complete)
+> **Last Updated**: 2026-11-06 (Phase 6 complete)
 
 ---
 
@@ -83,10 +83,10 @@
 
 | # | Sub-Phase | Task | Status | Date | Notes |
 |---|-----------|------|--------|------|-------|
-| 6.1 | P6-S1 | Create test data directories (`test_data/images/conjunctiva/`, `test_data/images/fingernails/`) | 🔲 Not Implemented | — | — |
-| 6.2 | P6-S2 | Generate `clinical_data.csv` with 5 rows of mock data | 🔲 Not Implemented | — | — |
-| 6.3 | P6-S3 | Create dummy image generator script (`generate_dummy_images.py`) | 🔲 Not Implemented | — | — |
-| 6.4 | P6-S4 | Create Django management command (`ingest_test_data.py`) | 🔲 Not Implemented | — | — |
+| 6.1 | P6-S1 | Create test data directories (`test_data/images/conjunctiva/`, `test_data/images/fingernails/`) | ✅ Tested | 2026-11-06 | Created folders for dummy image storage and scripts |
+| 6.2 | P6-S2 | Generate `clinical_data.csv` with 5 rows of mock data | ✅ Tested | 2026-11-06 | 5 clinical test rows with JSON-encoded ICD-10 codes |
+| 6.3 | P6-S3 | Create dummy image generator script (`generate_dummy_images.py`) | ✅ Tested | 2026-11-06 | Successfully generated 10 JPEG images (224x224) with text annotations |
+| 6.4 | P6-S4 | Create Django management command (`ingest_test_data.py`) | ✅ Implemented | 2026-11-06 | Command parses CSV, uses Django File wrapper, dispatches Celery tasks |
 
 ---
 
@@ -108,7 +108,7 @@
 | Phase 3 | 5 | 5 | 0 | 0 | 0 |
 | Phase 4 | 3 | 3 | 0 | 0 | 0 |
 | Phase 5 | 6 | 6 | 0 | 0 | 0 |
-| Phase 6 | 4 | 0 | 0 | 0 | 4 |
+| Phase 6 | 4 | 4 | 0 | 0 | 0 |
 | Phase 7 | 2 | 0 | 0 | 0 | 2 |
-| **Total** | **31** | **25** | **0** | **0** | **6** |
+| **Total** | **31** | **29** | **0** | **0** | **2** |
 
