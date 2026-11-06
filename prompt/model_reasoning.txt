@@ -56,3 +56,68 @@ NEXT STEPS:
 (Subsequent reasoning entries will be appended below as implementation proceeds)
 ================================================================================
 
+================================================================================
+STEP 2: PHASE 2 IMPLEMENTATION — DJANGO BACKEND & API (2026-11-06)
+================================================================================
+
+CONTEXT:
+  User confirmed "move to phase 2". Implemented all 6 sub-phases (P2-S1 - P2-S6).
+
+REASONING:
+
+  P2-S1 & P2-S2 — Django project + API app initialization:
+    - Needed network access to pip install Django, DRF, and django-cors-headers
+      into the venv (sandbox blocks network by default).
+    - Ran `django-admin startproject core .` inside backend/ — this creates the
+      standard Django project scaffold (manage.py, core/ package).
+    - Ran `python manage.py startapp api` — creates the api app scaffold.
+    - Did NOT install the full requirements.txt (torch, etc.) yet — those are
+      heavy and not needed until Phase 3. Only installed what Phase 2 needs.
+
+  P2-S3 — Settings configuration:
+    - Added 'api', 'rest_framework', 'corsheaders' to INSTALLED_APPS.
+    - Placed CorsMiddleware at the TOP of MIDDLEWARE list (before SecurityMiddleware)
+      as required by django-cors-headers documentation.
+    - Set CORS_ALLOW_ALL_ORIGINS = True for development.
+    - Changed DATABASE from sqlite3 to postgresql with Phase 1 credentials.
+    - Added CELERY_BROKER_URL and CELERY_RESULT_BACKEND pointing to Redis.
+    - Added MEDIA_URL and MEDIA_ROOT for user-uploaded images.
+    - Added `import os` at the top for os.path.join in MEDIA_ROOT.
+    - Set ALLOWED_HOSTS = ['*'] for development convenience.
+
+  P2-S4 — PatientRecord model:
+    - Implemented all fields exactly as specified in the prompt.
+    - Added STATUS_CHOICES as a class-level constant for cleanliness.
+    - Added __str__ method for admin/debugging readability.
+    - Added Meta.ordering = ['-created_at'] for sensible default ordering.
+    - Used uuid.uuid4 (not uuid4()) as default — Django calls the function.
+
+  P2-S5 — Serializer + ViewSet:
+    - PatientRecordSerializer uses fields='__all__' with read_only_fields for
+      risk_score and status (these are set by the system, not the user).
+    - PatientRecordViewSet.perform_create:
+      1. Saves the instance first (so it has a DB record/pk).
+      2. Imports the Celery task inline (to avoid circular imports since
+         tasks.py imports the model).
+      3. Calls .delay(str(instance.id)) — str() because UUID isn't JSON-
+         serializable by default in Celery.
+      4. Updates status to 'PROCESSING' and saves.
+
+  P2-S6 — URL routing:
+    - Used DefaultRouter to register the ViewSet at 'records' → /api/records/.
+    - Added admin URLs for convenience.
+    - Appended static() for media file serving in development.
+
+VERIFICATION:
+  - All 5 Python files pass py_compile syntax check.
+  - Django setup fails on psycopg2 import (expected — no Postgres driver installed
+    yet, and no Postgres running). This is normal and will resolve when the full
+    requirements.txt is installed with Docker running.
+
+NEXT STEPS:
+  - Await user confirmation to begin Phase 3 (Multimodal ML Engine).
+
+================================================================================
+(Subsequent reasoning entries will be appended below as implementation proceeds)
+================================================================================
+

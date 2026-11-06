@@ -2,7 +2,7 @@
 
 > **Project**: Iron Deficiency Anemia Detection System
 > **Started**: 2026-11-06
-> **Last Updated**: 2026-11-06
+> **Last Updated**: 2026-11-06 (Phase 2 complete)
 
 ---
 
@@ -35,12 +35,12 @@
 
 | # | Sub-Phase | Task | Status | Date | Notes |
 |---|-----------|------|--------|------|-------|
-| 2.1 | P2-S1 | Initialize Django project (`django-admin startproject core .`) | 🔲 Not Implemented | — | — |
-| 2.2 | P2-S2 | Create API app (`python manage.py startapp api`) | 🔲 Not Implemented | — | — |
-| 2.3 | P2-S3 | Configure `core/settings.py` (apps, middleware, CORS, DB, Celery, media) | 🔲 Not Implemented | — | — |
-| 2.4 | P2-S4 | Define `PatientRecord` model in `api/models.py` | 🔲 Not Implemented | — | — |
-| 2.5 | P2-S5 | Build API serializer (`PatientRecordSerializer`) and viewset (`PatientRecordViewSet`) | 🔲 Not Implemented | — | — |
-| 2.6 | P2-S6 | Configure URL routing with `DefaultRouter` + static media serving | 🔲 Not Implemented | — | — |
+| 2.1 | P2-S1 | Initialize Django project (`django-admin startproject core .`) | ✅ Implemented | 2026-11-06 | Django 4.2.30 project scaffolded in `backend/` |
+| 2.2 | P2-S2 | Create API app (`python manage.py startapp api`) | ✅ Implemented | 2026-11-06 | `api/` app created with models, views, migrations |
+| 2.3 | P2-S3 | Configure `core/settings.py` (apps, middleware, CORS, DB, Celery, media) | ✅ Implemented | 2026-11-06 | CORS at top of middleware, PostgreSQL DB, Celery redis, media config |
+| 2.4 | P2-S4 | Define `PatientRecord` model in `api/models.py` | ✅ Implemented | 2026-11-06 | UUID pk, all fields per spec, status choices, Meta ordering |
+| 2.5 | P2-S5 | Build API serializer (`PatientRecordSerializer`) and viewset (`PatientRecordViewSet`) | ✅ Implemented | 2026-11-06 | Read-only risk_score/status, perform_create dispatches Celery task |
+| 2.6 | P2-S6 | Configure URL routing with `DefaultRouter` + static media serving | ✅ Implemented | 2026-11-06 | `/api/records/` endpoint + media static serving |
 
 ---
 
@@ -103,12 +103,12 @@
 
 | Phase | Total Sub-Phases | Completed | In Progress | Errors | Remaining |
 |-------|-----------------|-----------|-------------|--------|-----------|
-| Phase 1 | 5 | 0 | 0 | 0 | 5 |
-| Phase 2 | 6 | 0 | 0 | 0 | 6 |
+| Phase 1 | 5 | 5 | 0 | 0 | 0 |
+| Phase 2 | 6 | 6 | 0 | 0 | 0 |
 | Phase 3 | 5 | 0 | 0 | 0 | 5 |
 | Phase 4 | 3 | 0 | 0 | 0 | 3 |
 | Phase 5 | 6 | 0 | 0 | 0 | 6 |
 | Phase 6 | 4 | 0 | 0 | 0 | 4 |
 | Phase 7 | 2 | 0 | 0 | 0 | 2 |
-| **Total** | **31** | **0** | **0** | **0** | **31** |
+| **Total** | **31** | **11** | **0** | **0** | **20** |
 
