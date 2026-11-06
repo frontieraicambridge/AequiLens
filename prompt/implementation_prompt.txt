@@ -1,0 +1,118 @@
+SYSTEM ROLE & OBJECTIVE
+You are an autonomous AI software engineer. Your objective is to build a full-stack, multimodal machine learning application for Iron Deficiency Anemia Detection. You must execute the following 7 phases sequentially. Do not skip any steps. When a file is requested, write the complete file.
+
+
+PHASE 1: Repository Initialization & Infrastructure Setup
+Objective: Establish the workspace, container orchestration, and dependency management.
+Workspace: Create a root directory named anemia_detection_system and initialize a git repository. All subsequent work will be inside this root.
+Docker Orchestration (docker-compose.yml):
+Create this file at the root.
+Define a postgres service: Use image postgres:15-alpine. Map port 5432:5432. Set environment variables: POSTGRES_USER=anemia_user, POSTGRES_PASSWORD=anemia_pass, POSTGRES_DB=anemia_db. Create a named volume postgres_data and map it to /var/lib/postgresql/data.
+Define a redis service: Use image redis:7-alpine. Map port 6379:6379.
+Backend Environment:
+Create a backend/ directory.
+Create backend/requirements.txt with the following pinned/exact libraries: Django>=4.2, djangorestframework>=3.14, django-cors-headers>=4.2, psycopg2-binary>=2.9, celery>=5.3, redis>=5.0, torch>=2.0, torchvision>=0.15, opencv-python-headless>=4.8, Pillow>=10.0, numpy>=1.24, scikit-learn>=1.3.
+Frontend Environment:
+Create a frontend/ directory (initialization will happen in Phase 5).
+
+
+PHASE 2: Django Backend & API Construction
+Objective: Set up the Django API, database schema, and file handling.
+Django Project Initialization:
+Inside backend/, run django-admin startproject core .
+Run python manage.py startapp api.
+Settings Configuration (core/settings.py):
+Add 'api', 'rest_framework', and 'corsheaders' to INSTALLED_APPS.
+Insert 'corsheaders.middleware.CorsMiddleware' at the top of MIDDLEWARE.
+Set CORS_ALLOW_ALL_ORIGINS = True.
+Update the DATABASES setting to use the postgresql engine with the credentials defined in Phase 1.
+Configure Celery: CELERY_BROKER_URL = 'redis://localhost:6379/0', CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'.
+Configure Media storage: MEDIA_URL = '/media/', MEDIA_ROOT = os.path.join(BASE_DIR, 'media').
+Database Schema (api/models.py):
+Import uuid.
+Create PatientRecord(models.Model).
+Fields:
+id: models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+patient_id: models.CharField(max_length=100, db_index=True)
+sample_id: models.CharField(max_length=100, db_index=True)
+conjunctiva_img: models.ImageField(upload_to='images/conjunctiva/')
+fingernail_img: models.ImageField(upload_to='images/fingernails/')
+diagnosis_codes: models.JSONField(default=list)
+symptoms: models.TextField()
+risk_score: models.FloatField(null=True, blank=True)
+status: models.CharField(max_length=20, choices=[('PENDING', 'Pending'), ('PROCESSING', 'Processing'), ('COMPLETED', 'Completed'), ('FAILED', 'Failed')], default='PENDING')
+created_at: models.DateTimeField(auto_now_add=True)
+API Layer (api/serializers.py & api/views.py):
+serializers.py: Create PatientRecordSerializer(serializers.ModelSerializer). Include all fields. Make risk_score and status read-only.
+views.py: Create PatientRecordViewSet(viewsets.ModelViewSet). Define queryset and serializer_class.
+Override perform_create(self, serializer): Save the instance. Then, import the Celery task (to be created in Phase 4) and call .delay(str(instance.id)). Update the instance status to PROCESSING.
+Update core/urls.py to route to the ViewSet using a DefaultRouter, and append static(...) to serve images.
+
+
+PHASE 3: Multimodal Machine Learning Engine
+Objective: Define the preprocessing logic and PyTorch multimodal architecture.
+Directory Setup: Inside backend/api/, create ml_engine/ with an empty __init__.py.
+Preprocessing (api/ml_engine/preprocess.py):
+Write process_image(image_path): Use PIL.Image.open. Apply torchvision.transforms: Resize((224, 224)), ToTensor(), and Normalize. Add a batch dimension .unsqueeze(0).
+Write process_clinical_data(diagnosis_list, symptoms_text): Create a placeholder function that outputs a tensor of shape (1, 128).
+Model Architecture (api/ml_engine/model.py):
+Create class AnemiaMultimodalNet(nn.Module).
+Initialize two resnet50(pretrained=True) backbones for fingernails and conjunctiva (stripping the final FC layers).
+Create a tabular_mlp for the 128-d clinical data.
+Create a fusion_head that concatenates features and outputs a single Sigmoid probability.
+Inference Logic (api/ml_engine/predict.py):
+Write run_prediction(patient_record_id) to query the DB, load images/data, run the model, and return a float risk score.
+
+
+PHASE 4: Celery Task Integration
+Objective: Decouple ML inference from the API request cycle.
+Celery Config (core/celery.py):
+Initialize Celery and auto-discover tasks. Expose it in core/__init__.py.
+Task Definition (api/tasks.py):
+Write @shared_task def predict_anemia_risk(self, record_id):
+Inside a try/except block, fetch PatientRecord, run inference, and update the DB with the risk score and status (COMPLETED or FAILED).
+
+
+PHASE 5: React Frontend Construction
+Objective: Build a dynamic UI with drag-and-drop file support and background polling.
+Initialization: Navigate to frontend/. Run npm create vite@latest . --template react.
+Dependencies: Install axios react-dropzone tailwindcss postcss autoprefixer lucide-react.
+Tailwind Setup: Initialize and configure Tailwind CSS.
+Main Application (src/App.jsx):
+Create a UI to manage state between an UploadForm and ResultsDisplay.
+Upload Component (src/components/UploadForm.jsx):
+Add text inputs for patient_id, sample_id, symptoms, and diagnosis.
+Create two separate useDropzone areas for images.
+POST to http://localhost:8000/api/records/ via FormData.
+Results Component (src/components/ResultsDisplay.jsx):
+Poll http://localhost:8000/api/records/${recordId}/ every 3 seconds.
+Render loading states, error states, and a visual risk gauge when completed.
+
+
+PHASE 6: Test Data Generation & Database Ingestion
+Objective: Create sample multimodal test data and a script to populate the local database for testing.
+Data Directory Setup:
+Inside backend/, create directories: test_data/images/conjunctiva/ and test_data/images/fingernails/.
+Clinical Data CSV (backend/test_data/clinical_data.csv):
+Instruct the agent to generate a CSV file with columns: patient_id, sample_id, icd10_codes, symptoms.
+Populate it with 5 rows of realistic mock data (e.g., patient "P001" with sample "S001" and sample "S002"). Format icd10_codes as a JSON string (e.g., ["D50.0", "D50.9"]).
+Dummy Image Generator (backend/scripts/generate_dummy_images.py):
+Write a Python script using PIL to generate solid-colored 224x224 placeholder images (with text overlay identifying the sample).
+For every row in the CSV, the script should generate {patient_id}_{sample_id}_conjunctiva.jpg and {patient_id}_{sample_id}_fingernail.jpg and place them in their respective test_data/images/ folders.
+Django Ingestion Command (api/management/commands/ingest_test_data.py):
+Create a custom Django management command.
+The command should read backend/test_data/clinical_data.csv using Python's csv module.
+For each row, it should programmatically create a PatientRecord instance.
+It must use Django's File wrapper to attach the matching dummy images from the test_data/images/ folders to the conjunctiva_img and fingernail_img model fields.
+Call predict_anemia_risk.delay(record.id) on creation to simulate the processing pipeline.
+
+PHASE 7: Final Wiring & Documentation
+Objective: Ensure the system is reproducible and executable by a human operator.
+Create README.md at the repository root.
+Populate README with explicit execution steps:
+Docker command: docker-compose up -d
+Django commands: cd backend && python manage.py makemigrations && python manage.py migrate
+Data Ingestion: python manage.py runscript generate_dummy_images (if using django-extensions) or raw python script, followed by python manage.py ingest_test_data.
+Backend startup: python manage.py runserver 0.0.0.0:8000
+Celery worker: celery -A core worker --loglevel=info
+Frontend startup: cd frontend && npm install && npm run dev

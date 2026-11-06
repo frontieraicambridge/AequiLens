@@ -1,0 +1,11 @@
+Following the implementation plan provided in [implementation_prompt.txt](file;file:///Users/m.rashid.1/Mamun/code/AequiLens/prompt/implementation_prompt.txt) file, can you please create a detailed phase and sub-phase implementation plan
+
+Add this detailed phase, sub phases detailed implement plan in a tabular format in implementation_plan.md 
+
+Also, inside the prompt directory, create an implementation_log.md file where you keep writing as you implement different phases and sub-phases and sections within those. The log file should be in tabular format capturing implementation proicess log ( for example, in status column, implemented, tested, error, not implemented yet ). 
+
+Make sure you create a very detailed list of phases and sub-phases in a tabular format in the implementation_log.md file. 
+
+Also, you add a model_reasoning.txt inside prompt directory to record the LLM reasoning in each step so that later if we use another LLM we can provide all these necessary files in the context along with the LLM reasoning to continue the development process. 
+
+First you create the implementation plan. Then before you implement each phase you as for my confirmation. 
